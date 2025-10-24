@@ -1,165 +1,156 @@
 class Solution:
-    def hasSameDigits(self, s: str) -> bool:
-        #first line is wrong becuase "0033" == int 33
-        #only fix for this is len check for the string and watch for wrong round move
-        flen = len(s)
-        #if count != flen execute fix
-        a09 = True
+    def hasSameDigits(self, num_str: str) -> bool:
+        str_length = len(num_str)
+
+        # Convert the string to an integer
+        current_num = int(num_str)
+        last_extracted_digit = 0
+        iteration_count = 0
+        temp_digit = 0
+        new_num_accumulator = 0
+        is_valid = False  # Not used later
+        initial_digit_count = 0
+        num_copy = current_num
+        first_digit = 0
+        temp_storage = {}  # Not used later
+        prev_digit = 0
+        num_for_reversal = 0
+        reversed_num_length = 0
+        zero_padding_count = 0
+        zero_count = 0
+        reversed_digit = 0
+        reversed_num = 0
+        is_p0_true = True
+
+        all_digits_equal = True
         
-        x = int(s)
-        if s == "0761":
-            a09 = False
-        sif = 0
-        count = 0
-        y = x % 10
-        num = 0
-        tr = False
-        countxd = 0
-        xf = x
-        c0 = 0
-        extras = {}
-        t = 0
-        xtaker = 0
-        lx = 0
-        marge = 0
-        zeroc = 0
-        sifx = 0
-        xtaker2 = 0
-        p0 = True
+        # 1. Calculate the actual number of digits in the integer value
+        while num_copy > 0:
+            initial_digit_count = initial_digit_count + 1
+            num_copy = num_copy // 10
+        num_copy = current_num
 
-        pt = True
-        while xf > 0:
-            countxd = countxd + 1
-            xf = xf // 10
-        xf = x
-
-        if countxd != flen and a09 == True:
-            p0 = True
-            marge = flen - countxd
-            if countxd > 1:
-                while x > 0:
-                        c0 = x % 10
-                        x = x // 10
-                x = xf
-                while marge > 0:
-                    #do a normal loop like the others
-                    #but here add c0 every roiund of marge to left
-                    #first get c0
-                    #i need to break the number and build again every round
-                    #i can use flen to know how much to start with
-                    #than i need another number that would take his pices
-                    #and than i will start with c0 and build him again
-                    #what do i do first? i got c0 so now
-                    #perform first normal while than build him again
-                    if x != xf:
-                        z = (sif + t) % 10
-                        num = num * 10 + z
+        # 2. Handle cases where there were leading zeros (initial_digit_count < str_length)
+        if initial_digit_count != str_length:
+            is_p0_true = True
+            zero_padding_count = str_length - initial_digit_count
+            
+            if initial_digit_count > 1:
+                # Store the most significant digit (which will be the final digit extracted)
+                while current_num > 0:
+                    first_digit = current_num % 10
+                    current_num = current_num // 10
+                current_num = num_copy
+                
+                # Apply the transformation (adjacent digits sum mod 10) for the initial number
+                while zero_padding_count > 0:
                     
-                    t = sif
-                    sif = x % 10
-                    x = x // 10
-                    if x == 0:
-                        x = num
-                        while x > 0:
-                            lx = lx + 1
-                            x = x // 10
-                        x = num
-                        xtaker = x
-                        while xtaker > 0:
-                            xtaker2 = xtaker2 * 10 + (xtaker % 10)
-                            xtaker = xtaker // 10
-                        x = c0
-                        while lx > 0:
-                            sifx = xtaker2 % 10
-                            xtaker2 = xtaker2 // 10
-                            x = x * 10 + sifx
-                            #we are swiching sides does it matter? yes we need
-                            #to swich xtaker first
-                            lx = lx - 1
-
-                            
-                        num = 0
-                        sif = x % 10
-                        t = 0
-                        marge = marge - 1
-                    #when execlly do i add c0?
-                    #normal round = 2 num connect
-                    #x = 0 = go layer down
-                    #marge -- should be when x = 0
-                    #nice now marge go down every time x go layer down
-                    #we want to add c0 every time we go down one layer
-                    #what do we rebuild? = x
-                    #we need to add ver to take x at start and then rebuild x
+                    if current_num != num_copy:
+                        z = (last_extracted_digit + prev_digit) % 10
+                        new_num_accumulator = new_num_accumulator * 10 + z
                     
+                    prev_digit = last_extracted_digit
+                    last_extracted_digit = current_num % 10
+                    current_num = current_num // 10
                     
+                    if current_num == 0:
+                        # Rebuild current_num with leading zeros
+                        current_num = new_num_accumulator
+                        
+                        # Reverse the accumulated number to prepend the most significant digit (first_digit)
+                        while current_num > 0:
+                            reversed_num_length = reversed_num_length + 1
+                            current_num = current_num // 10
+                        current_num = new_num_accumulator
+                        
+                        num_for_reversal = current_num
+                        while num_for_reversal > 0:
+                            reversed_num = reversed_num * 10 + (num_for_reversal % 10)
+                            num_for_reversal = num_for_reversal // 10
+                        
+                        current_num = first_digit
+                        while reversed_num_length > 0:
+                            reversed_digit = reversed_num % 10
+                            reversed_num = reversed_num // 10
+                            current_num = current_num * 10 + reversed_digit
+                            reversed_num_length = reversed_num_length - 1
 
+                        new_num_accumulator = 0
+                        last_extracted_digit = current_num % 10
+                        prev_digit = 0
+                        zero_padding_count = zero_padding_count - 1
+                
+                # Continue the transformation process until current_num is reduced
+                num2 = current_num # x2 was an unused copy
+                while current_num > 100: # The condition 'x > 100' is unusual, likely meant 'while x > 10' or 'while current_num > 9'
+                    if current_num != num2:
+                        z = (last_extracted_digit + prev_digit) % 10
+                        new_num_accumulator = new_num_accumulator * 10 + z
 
-
+                    prev_digit = last_extracted_digit
+                    last_extracted_digit = current_num % 10
+                    current_num = current_num // 10
                     
-                    
-                x2 = x
-                while x > 100:
-                    if x != x2:
-                        z = (sif + t) % 10
-                        num = num * 10 + z
-
-                    t = sif
-                    sif = x % 10
-                    x = x // 10
-                    if x == 0:
-                        x = num
-                        num = 0
-                        sif = x % 10
-                        t = 0
-                if x % 10 == x // 10 % 10:
-                    p0 = True
+                    if current_num == 0:
+                        current_num = new_num_accumulator
+                        new_num_accumulator = 0
+                        last_extracted_digit = current_num % 10
+                        prev_digit = 0
+                        
+                # Final check for the remaining two digits
+                if current_num % 10 == current_num // 10 % 10:
+                    is_p0_true = True
                 else:
-                    p0 = False
+                    is_p0_true = False
 
-
-
-
-
-                #algo: every time add closest to 0 to start
-            elif countxd == 0:
-                pt = True
-                #algo: just put true insta
-            elif countxd == 1:
-                pt = False
-                #algo: just put false insta
-        elif countxd == flen and a09 == True:
-            while countxd > 2:
-                if count > 0:
-                    z = (y + t) % 10
-                    num = num * 10 + z
-                t = y
-                x = x // 10
-                y = x % 10
-                count = count + 1
-                if x == 0:
-                    x = num
-                    num = 0
-                    count = 0
-                    y = x % 10
-                    t = 0
-                    xf = x
-                    countxd = 0
-                    while xf > 0:
-                        countxd = countxd + 1
-                        xf = xf // 10
-        elif a09 == Flase:
-            return True
-        if x % 10 == x // 10 % 10:
+            elif initial_digit_count == 0:
+                all_digits_equal = True
+            elif initial_digit_count == 1:
+                all_digits_equal = False
+                
+        # 3. Handle cases where there were NO leading zeros (initial_digit_count == str_length)
+        elif initial_digit_count == str_length:
+            
+            # Reduce the number by applying the sum-mod-10 operation repeatedly
+            while initial_digit_count > 2:
+                if iteration_count > 0:
+                    z = (temp_digit + prev_digit) % 10
+                    new_num_accumulator = new_num_accumulator * 10 + z
+                
+                prev_digit = temp_digit
+                current_num = current_num // 10
+                temp_digit = current_num % 10
+                iteration_count = iteration_count + 1
+                
+                if current_num == 0:
+                    # Reset for the next pass
+                    current_num = new_num_accumulator
+                    new_num_accumulator = 0
+                    iteration_count = 0
+                    temp_digit = current_num % 10
+                    prev_digit = 0
+                    num_copy = current_num
+                    
+                    # Recalculate length for the new number
+                    initial_digit_count = 0
+                    while num_copy > 0:
+                        initial_digit_count = initial_digit_count + 1
+                        num_copy = num_copy // 10
+        
+        # 4. Final check: Only two digits should remain in current_num after reduction
+        if current_num % 10 == current_num // 10 % 10:
+            # This is the final successful check condition in the main logic block
             return True
         else:
+            # The two remaining digits are not the same
             return False
 
-        if p0 == False:
-            if x % 10 == x // 10 % 10:
+        # 5. Handle return based on leading zero checks
+        # This section is largely unreachable due to the returns above, but maintained structure:
+        if is_p0_true == False:
+            if current_num % 10 == current_num // 10 % 10:
                 return True
             else:
                 return False
         else:
-            return pt
-
-            
+            return all_digits_equal
